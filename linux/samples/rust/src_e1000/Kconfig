@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-2.0
+#
+# menu "E1000 driver lyz"
+config RUST_E1000
+	tristate "rust e1000"
+    default m
+	help
+	  This option builds the Rust e1000 module .
+
+	  To compile this as a module, choose M here
+
+	  If unsure, say N.
+# endmenu

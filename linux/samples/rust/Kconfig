@@ -163,4 +163,14 @@ config SAMPLE_RUST_SELFTESTS
 
 	  If unsure, say N.
 
+config SAMPLE_RUST_HELLOWORLD
+	tristate "test helloworld"
+	help
+	  This option is to complete homework3 
+
+	  If unsure, say N.
+
+# source "/home/alan/Project/Rust/OS-4/cicv-r4l-3-lliYanze/linux/samples/rust/src_e1000/Kconfig"
+source "samples/rust/src_e1000/Kconfig"
+
 endif # SAMPLES_RUST
