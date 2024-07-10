@@ -1,11 +1,16 @@
 #!/bin/sh
 busybox_folder="/home/alan/Project/Rust/OS-4/cicv-r4l-3-lliYanze/busybox-1.36.1"
 kernel_image="/home/alan/Project/Rust/OS-4/cicv-r4l-3-lliYanze/linux/arch/x86/boot/bzImage"
+linux_dir="/home/alan/Project/Rust/OS-4/cicv-r4l-3-lliYanze/linux"
 work_dir=$PWD
 rootfs="rootfs"
 rootfs_img=$PWD"/rootfs_img"
 
-make LLVM=1
+set -e
+cd $linux_dir
+make LLVM=1 -j12
+cd $work_dir
+
 echo $base_path
 if [ ! -d $rootfs ]; then
 	mkdir $rootfs
