@@ -5,9 +5,11 @@
 #![allow(unused)]
 
 use core::iter::Iterator;
+use core::mem::drop;
 use core::sync::atomic::AtomicPtr;
 
 use kernel::device::RawDevice;
+use kernel::driver::DeviceRemoval;
 use kernel::pci::Resource;
 use kernel::prelude::*;
 use kernel::sync::Arc;
@@ -370,6 +372,7 @@ impl net::NapiPoller for NapiHandler {
     }
 }
 
+// 设备结构体
 struct E1000Drv {}
 
 impl pci::Driver for E1000Drv {
@@ -474,8 +477,12 @@ impl pci::Driver for E1000Drv {
 
     fn remove(data: &Self::Data) {
         pr_info!("Rust for linux e1000 driver demo (remove)\n");
+        // 在移除设备时释放资源
+        data.device_remove();
     }
 }
+
+/// 设备最终的模块结构体
 struct E1000KernelMod {
     _dev: Pin<Box<driver::Registration<pci::Adapter<E1000Drv>>>>,
 }
@@ -493,6 +500,11 @@ impl kernel::Module for E1000KernelMod {
 
 impl Drop for E1000KernelMod {
     fn drop(&mut self) {
-        pr_info!("Rust for linux e1000 driver demo (exit)\n");
+        // unsafe {
+        //     let dev_ptr = self._dev.as_mut().get_unchecked_mut();
+        //     core::ptr::drop_in_place(dev_ptr);
+        // }
+
+        pr_info!("Rust for linux e1000 driver demo (exit)2\n");
     }
 }

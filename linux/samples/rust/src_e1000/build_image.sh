@@ -7,9 +7,10 @@ rootfs="rootfs"
 rootfs_img=$PWD"/rootfs_img"
 
 set -e
-cd $linux_dir
-make LLVM=1 -j12
-cd $work_dir
+make LLVM=1
+# cd $linux_dir
+# make LLVM=1 -j12
+# cd $work_dir
 
 echo $base_path
 if [ ! -d $rootfs ]; then

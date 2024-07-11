@@ -18,4 +18,4 @@ obj-$(CONFIG_SAMPLE_RUST_SELFTESTS)		+= rust_selftests.o
 obj-$(CONFIG_SAMPLE_RUST_HELLOWORLD)		+= rust_helloworld.o
 
 subdir-$(CONFIG_SAMPLE_RUST_HOSTPROGS)		+= hostprogs
-subdir-y		+= src_e1000
+subdir-$(CONFIG_RUST_E1000)		+= src_e1000
