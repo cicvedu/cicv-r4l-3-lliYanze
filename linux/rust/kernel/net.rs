@@ -54,6 +54,11 @@ impl Device {
         unsafe { &*ptr.cast() }
     }
 
+    /// get the raw device pointer
+    pub fn get_net_device(&self) -> *mut bindings::net_device {
+        self.0.get()
+    }
+
     /// Sets carrier.
     pub fn netif_carrier_on(&self) {
         // SAFETY: The netdev is valid because the shared reference guarantees a nonzero refcount.

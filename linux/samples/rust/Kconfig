@@ -170,7 +170,5 @@ config SAMPLE_RUST_HELLOWORLD
 
 	  If unsure, say N.
 
-# source "/home/alan/Project/Rust/OS-4/cicv-r4l-3-lliYanze/linux/samples/rust/src_e1000/Kconfig"
-source "samples/rust/src_e1000/Kconfig"
 
 endif # SAMPLES_RUST

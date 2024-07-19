@@ -5,9 +5,12 @@
 #![allow(unused)]
 
 use core::iter::Iterator;
+use core::ops::Deref;
 use core::sync::atomic::AtomicPtr;
 
+use alloc::borrow::Borrow;
 use kernel::device::RawDevice;
+use kernel::linked_list::Wrapper;
 use kernel::pci::Resource;
 use kernel::prelude::*;
 use kernel::sync::Arc;
@@ -268,6 +271,7 @@ impl net::DeviceOperations for NetDevice {
 
     fn get_stats64(
         _netdev: &net::Device,
+
         _data: &NetDevicePrvData,
         stats: &mut net::RtnlLinkStats64,
     ) {
@@ -383,6 +387,8 @@ impl pci::Driver for E1000Drv {
     fn probe(dev: &mut pci::Device, id: core::option::Option<&Self::IdInfo>) -> Result<Self::Data> {
         pr_info!("Rust for linux e1000 driver demo (probe): {:?}\n", id);
 
+        pr_info!("pci device addr is: {:p}\n", dev as *mut _);
+
         // Note: only support QEMU's 82540EM chip now.
 
         // this works like a filter, the PCI device may have up to 6 bars, those bars have different types,
@@ -407,7 +413,7 @@ impl pci::Driver for E1000Drv {
             .find(|r: &Resource| r.check_flags(bindings::IORESOURCE_IO))
             .ok_or(kernel::error::code::EIO)?;
 
-        // TODO pci_save_state(pdev); not supported by crate now, only have raw C bindings.
+        // TODO pci_save_s,tate(pdev); not supported by crate now, only have raw C bindings.
 
         // alloc new ethernet device, this line represent the `alloc_etherdev()` and `SET_NETDEV_DEV()` in C version.
         let mut netdev_reg = net::Registration::<NetDevice>::try_new(dev)?;
@@ -472,8 +478,13 @@ impl pci::Driver for E1000Drv {
         })?)
     }
 
-    fn remove(data: &Self::Data) {
+    fn remove(dev: &mut pci::Device, data: &Self::Data) {
         pr_info!("Rust for linux e1000 driver demo (remove)\n");
+
+        let bars = dev.select_bars((bindings::IORESOURCE_MEM | bindings::IORESOURCE_IO) as u64);
+        dev.release_selected_regions(bars);
+        pr_info!("release_selected_regions\n");
+        dev.disable_device();
     }
 }
 struct E1000KernelMod {
