@@ -12,6 +12,7 @@
 use crate::{
     bindings,
     error::{from_kernel_result, to_result},
+    pr_info,
     str::CString,
     types::PointerWrapper,
     Error, Result, ScopeGuard,

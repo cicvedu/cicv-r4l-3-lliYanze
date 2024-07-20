@@ -278,6 +278,12 @@ impl Device {
         unsafe { bindings::pci_set_master(self.ptr) };
     }
 
+    /// disable bus-mastering for device
+    pub fn clear_master(&self) {
+        // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
+        unsafe { bindings::pci_clear_master(self.ptr) };
+    }
+
     /// get legacy irq number
     pub fn irq(&self) -> u32 {
         // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
