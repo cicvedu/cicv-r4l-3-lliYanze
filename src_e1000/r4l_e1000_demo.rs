@@ -45,7 +45,7 @@ struct NetDevicePrvData {
     tx_ring: SpinLock<Option<TxRingBuf>>,
     rx_ring: SpinLock<Option<RxRingBuf>>,
     irq: u32,
-    _irq_handler: AtomicPtr<kernel::irq::Registration<E1000InterruptHandler>>,
+    irq_handler: AtomicPtr<kernel::irq::Registration<E1000InterruptHandler>>,
 }
 
 // TODO not sure why it is safe to do this.
@@ -193,7 +193,7 @@ impl net::DeviceOperations for NetDevice {
             kernel::irq::flags::SHARED,
             fmt!("{}", data.dev.name()),
         )?;
-        data._irq_handler.store(
+        data.irq_handler.store(
             Box::into_raw(Box::try_new(req_reg)?),
             core::sync::atomic::Ordering::Relaxed,
         );
@@ -207,17 +207,15 @@ impl net::DeviceOperations for NetDevice {
         Ok(())
     }
 
-    fn stop(_dev: &net::Device, _data: &NetDevicePrvData) -> Result {
+    fn stop(dev: &net::Device, data: &NetDevicePrvData) -> Result {
         pr_info!("Rust for linux e1000 driver demo (net device stop)\n");
-        _dev.netif_stop_queue();
-        _dev.netif_carrier_off();
-        drop(&_data.rx_ring);
-        drop(&_data.tx_ring);
-        _data.napi.disable();
+        dev.netif_stop_queue();
+        dev.netif_carrier_off();
+        drop(&data.rx_ring);
+        drop(&data.tx_ring);
+        data.napi.disable();
         unsafe {
-            let irq = *_data
-                ._irq_handler
-                .load(core::sync::atomic::Ordering::Relaxed);
+            let irq = data.irq_handler.load(core::sync::atomic::Ordering::Relaxed);
             drop(Box::from_raw(irq));
         }
         Ok(())
@@ -482,7 +480,7 @@ impl pci::Driver for E1000Drv {
             tx_ring,
             rx_ring,
             irq,
-            _irq_handler: AtomicPtr::new(core::ptr::null_mut()),
+            irq_handler: AtomicPtr::new(core::ptr::null_mut()),
         })?)?;
 
         Ok(Box::try_new(E1000DrvPrvData {
