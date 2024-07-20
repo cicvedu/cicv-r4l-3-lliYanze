@@ -47,7 +47,7 @@ impl file::Operations for RustFile {
         _reader: &mut impl kernel::io_buffer::IoBufferReader,
         _offset: u64,
     ) -> Result<usize> {
-        // pr_info!("write to device\n");
+        pr_info!("write to device\n");
         let offset = _offset.try_into()?;
         let mut buffer = _this.inner.lock();
         let len = core::cmp::min(_reader.len(), buffer.len() - offset as usize);
