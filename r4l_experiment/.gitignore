@@ -1,0 +1,6 @@
+*
+*.*
+!driver/
+!boot.sh
+!.gitignore
+
